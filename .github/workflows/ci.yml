@@ -38,7 +38,7 @@ jobs:
     - name: Run Unit Tests (Pytest)
       run: |
         echo "Ejecutando pruebas automatizadas..."
-        pytest test/Unit Tests/test_app.py -v
+        pytest "test/Unit Tests/test_app.py" -v
 
     - name: Build Docker Image
       run: |
