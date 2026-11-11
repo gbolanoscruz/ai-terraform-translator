@@ -1,15 +1,14 @@
 import streamlit as st
-import google.generativeai as genai
+from google import genai
 import os
 import re
 from dotenv import load_dotenv
 
 # Cargar la llave secreta desde el archivo .env
 load_dotenv()
-genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 
-# Configurar el modelo de Gemini
-model = genai.GenerativeModel('gemini-3.1-flash-lite-preview')
+# Inicializar el cliente nuevo de Gemini
+client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
 
 def detect_provider(tf_code):
     """Detecta si el código original es de AWS, Azure o GCP."""
@@ -22,7 +21,7 @@ def detect_provider(tf_code):
     return "Desconocido"
 
 def translate_terraform(code, source, target):
-    """Manda el prompt a Gemini para traducir el código."""
+    """Manda el prompt a Gemini para traducir el código usando el SDK nuevo."""
     prompt = f"""
     Eres un ingeniero experto en DevOps, SRE y Terraform. 
     Convierte el siguiente código de Terraform que está hecho para {source} y tradúcelo para que funcione en {target}.
@@ -32,7 +31,11 @@ def translate_terraform(code, source, target):
     Código original:
     {code}
     """
-    response = model.generate_content(prompt)
+    # Llamada con la nueva sintaxis de google-genai
+    response = client.models.generate_content(
+        model='gemini-3.1-flash-lite-preview',
+        contents=prompt,
+    )
     return response.text.replace('```hcl', '').replace('```terraform', '').replace('```', '').strip()
 
 # --- INTERFAZ GRÁFICA CON STREAMLIT ---
